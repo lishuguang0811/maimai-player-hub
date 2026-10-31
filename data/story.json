@@ -1,0 +1,363 @@
+{
+  "start": "p0",
+  "nodes": {
+    "p0": {
+      "id": "p0",
+      "chapter": "序章",
+      "speaker": "ARCHIVE",
+      "text": "SECRET ARCHIVE 已启动。\n这里存放一些没寄出去的话，和一些没打完的歌。",
+      "bg": "star",
+      "kind": "line",
+      "next": "p0_r",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "p0_r": {
+      "id": "p0_r",
+      "chapter": "序章",
+      "speaker": "系统",
+      "text": "要现在打开吗？",
+      "bg": "star",
+      "kind": "choice",
+      "next": null,
+      "choices": [
+        {
+          "label": "打开档案",
+          "next": "p1",
+          "ach": null,
+          "ending": null
+        },
+        {
+          "label": "先看看四周",
+          "next": "p0_s",
+          "ach": null,
+          "ending": null
+        }
+      ],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": true
+    },
+    "p0_s": {
+      "id": "p0_s",
+      "chapter": "序章",
+      "speaker": "系统",
+      "text": "架子上只有一张旧车票，和一张写满箭头的谱面。",
+      "bg": "star",
+      "kind": "line",
+      "next": "p1",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "p1": {
+      "id": "p1",
+      "chapter": "序章",
+      "speaker": "ARCHIVE",
+      "text": "在开始之前，先确认一个日期。",
+      "bg": "star",
+      "kind": "line",
+      "next": "b1",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "b1": {
+      "id": "b1",
+      "chapter": "序章",
+      "speaker": "ARCHIVE",
+      "text": "输入你的生日（YYYY-MM-DD）。",
+      "bg": "star",
+      "kind": "birthday",
+      "next": null,
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "p2r": {
+      "id": "p2r",
+      "chapter": "序章",
+      "speaker": "ARCHIVE",
+      "text": "不是这个日子。再想想。",
+      "bg": "star",
+      "kind": "line",
+      "next": "b1",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "p3": {
+      "id": "p3",
+      "chapter": "第一章",
+      "speaker": "ARCHIVE",
+      "text": "身份确认完成。\n欢迎回来。",
+      "bg": "teal",
+      "kind": "line",
+      "next": "c1",
+      "choices": [],
+      "ach": "身份确认",
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c1": {
+      "id": "c1",
+      "chapter": "第一章",
+      "speaker": "你",
+      "text": "（这里比想象中安静。）",
+      "bg": "teal",
+      "kind": "line",
+      "next": "c1_r",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c1_r": {
+      "id": "c1_r",
+      "chapter": "第一章",
+      "speaker": "系统",
+      "text": "要做点什么？",
+      "bg": "teal",
+      "kind": "choice",
+      "next": null,
+      "choices": [
+        {
+          "label": "继续往里走",
+          "next": "c2",
+          "ach": null,
+          "ending": null
+        },
+        {
+          "label": "打开抽屉",
+          "next": "c1_d",
+          "ach": null,
+          "ending": null
+        },
+        {
+          "label": "把谱面带走",
+          "next": "c8",
+          "ach": null,
+          "ending": null
+        }
+      ],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": true
+    },
+    "c1_d": {
+      "id": "c1_d",
+      "chapter": "第一章",
+      "speaker": "系统",
+      "text": "抽屉里是一叠谱面，边角被翻得起了毛。",
+      "bg": "dark",
+      "kind": "line",
+      "next": "c2",
+      "choices": [],
+      "ach": "好奇心过剩",
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c2": {
+      "id": "c2",
+      "chapter": "第二章",
+      "speaker": "ARCHIVE",
+      "text": "这些谱面，有一个人练了很久。",
+      "bg": "dark",
+      "kind": "line",
+      "next": "c2_r",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c2_r": {
+      "id": "c2_r",
+      "chapter": "第二章",
+      "speaker": "ARCHIVE",
+      "text": "想知道是谁的吗？",
+      "bg": "dark",
+      "kind": "choice",
+      "next": null,
+      "choices": [
+        {
+          "label": "想",
+          "next": "c3",
+          "ach": null,
+          "ending": null
+        },
+        {
+          "label": "不想",
+          "next": "c4",
+          "ach": null,
+          "ending": null
+        }
+      ],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": true
+    },
+    "c3": {
+      "id": "c3",
+      "chapter": "第二章",
+      "speaker": "你",
+      "text": "……",
+      "bg": "dark",
+      "kind": "line",
+      "next": "c4",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c4": {
+      "id": "c4",
+      "chapter": "第二章",
+      "speaker": "ARCHIVE",
+      "text": "那个人每次打到这里，都会停一下。",
+      "bg": "dark",
+      "kind": "line",
+      "next": "c5",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c5": {
+      "id": "c5",
+      "chapter": "终章",
+      "speaker": "ARCHIVE",
+      "text": "最后一页，是一封信。",
+      "bg": "dawn",
+      "kind": "choice",
+      "next": null,
+      "choices": [
+        {
+          "label": "继续听",
+          "next": "c6",
+          "ach": null,
+          "ending": null
+        },
+        {
+          "label": "合上档案",
+          "next": "c7",
+          "ach": null,
+          "ending": null
+        }
+      ],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c6": {
+      "id": "c6",
+      "chapter": "终章",
+      "speaker": "ARCHIVE",
+      "text": "谢谢你听完。",
+      "bg": "dawn",
+      "kind": "line",
+      "next": "c6l",
+      "choices": [],
+      "ach": null,
+      "ending": "END01",
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c6l": {
+      "id": "c6l",
+      "chapter": "终章",
+      "speaker": "ARCHIVE",
+      "text": "信在这里。",
+      "bg": "dawn",
+      "kind": "letter",
+      "next": null,
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c7": {
+      "id": "c7",
+      "chapter": "终章",
+      "speaker": "ARCHIVE",
+      "text": "把没说完的话，留到下次吧。",
+      "bg": "dawn",
+      "kind": "line",
+      "next": "p0",
+      "choices": [],
+      "ach": null,
+      "ending": "END02",
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c8": {
+      "id": "c8",
+      "chapter": "终章",
+      "speaker": "你",
+      "text": "（把谱面折好，放进口袋。）",
+      "bg": "cyber",
+      "kind": "line",
+      "next": "c8_r",
+      "choices": [],
+      "ach": null,
+      "ending": null,
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    },
+    "c8_r": {
+      "id": "c8_r",
+      "chapter": "终章",
+      "speaker": "ARCHIVE",
+      "text": "带走也可以。它本来就该跟着会打的人。",
+      "bg": "cyber",
+      "kind": "line",
+      "next": "p0",
+      "choices": [],
+      "ach": null,
+      "ending": "END03",
+      "flag": null,
+      "effect": null,
+      "reaction": false
+    }
+  }
+}

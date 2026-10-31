@@ -1,0 +1,29 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# ---- 本地数据（会随使用变化，不入库）----
+data/accounts.json
+data/userdata.json
+data/settings.json
+data/galgame_saves.json
+data/share/
+data/INITIAL_ADMIN_PASSWORD.txt
+outputs/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# ---- 打包产物 ----
+*.zip
+*.exe
+*.pptx
