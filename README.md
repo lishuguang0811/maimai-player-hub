@@ -1,4 +1,4 @@
-# 舞萌助手 · MAIMAI PLAYER HUB
+﻿# 舞萌助手 · MAIMAI PLAYER HUB
 
 > 一个跑在自己电脑上的舞萌 DX（maimai DX）个人助手：曲库检索、选曲推荐、练习清单、成绩记录、收藏、分享图，以及一个可以自己写的「私人空间」。
 
@@ -44,7 +44,7 @@
 需要 Python 3.10+（推荐 3.12）。
 
 ```bash
-git clone https://github.com/<your-name>/maimai-player-hub.git
+git clone https://github.com/lishuguang0811/maimai-player-hub.git
 cd maimai-player-hub
 
 python -m venv .venv
