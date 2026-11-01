@@ -144,43 +144,6 @@ def candidates_for_tier(records: list[dict], tier: dict) -> list[dict]:
     return out
 
 
-def pool_size_report(records: list[dict]) -> list[dict]:
-    """给调试页用：每个档位有多少候选，方便判断区间是否设得太窄。"""
-    rows = []
-    for tier in config.TIERS:
-        pool = candidates_for_tier(records, tier)
-        rows.append({
-            "label": tier["label"],
-            "range": f"{tier['ds_min']} ~ {tier['ds_max']}",
-            "diff": "/".join(tier.get("diffs")
-                             or [config.DIFF_ORDER[tier.get("diff_index", 3)]]),
-            "total": len(pool),
-            "vocaloid": sum(1 for r in pool if r["genre"] == config.VOCALOID_GENRE),
-            "miku": sum(1 for r in pool if is_miku_related(r)),
-        })
-    return rows
-
-def vocaloid_library(records: list[dict]) -> list[dict]:
-    """
-    术力口曲库浏览器用的数据：每个曲名只保留定数最高的一条谱面，
-    按定数从高到低排序，并打上 is_miku 标记。
-    全部来自快照原值，不做任何推测。
-    """
-    best: dict[str, dict] = {}
-    for r in records:
-        if r.get("genre") != config.VOCALOID_GENRE:
-            continue
-        title = r["title"]
-        if title not in best or r["ds"] > best[title]["ds"]:
-            best[title] = r
-    out = list(best.values())
-    for r in out:
-        r = r
-    out.sort(key=lambda x: (-x["ds"], x["title"]))
-    for r in out:
-        r["is_miku"] = is_miku_related(r)
-    return out
-
 def song_select_view(records: list[dict]) -> list[dict]:
     """
     1:1 风格选曲页用的数据：每首歌聚合全部 5 个难度的 等级+定数，

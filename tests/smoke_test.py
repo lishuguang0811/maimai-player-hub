@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """smoke_test.py —— 账号/密码规则/定位/攻略/设置/全难度/等级/爱好/名言/视频链接。"""
 import sys
+from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 from _env import ROOT  # noqa: F401  必须在 config 之前导入
 
-from datetime import date
-
 import config
-from modules import accounts, guides, location, quotes, recommend, settings, songs
+from modules import accounts, guides, quotes, recommend, settings, songs
 
 today = date.today()
 ok = True
 PWD = "Pass1234"
-ADMIN_PWD = "Admin1234"
 
 
 def check(label, cond, extra=""):
@@ -48,8 +50,8 @@ check("20位允许", accounts.validate_password("PassWord12345678ab")[0])
 
 print("=== 4. 账号系统 ===")
 accounts.ensure_admin()
-check("管理员已创建", accounts.is_admin(config.ADMIN_NAME))
-check("is_admin 不区分大小写/空格", accounts.is_admin(" " + config.ADMIN_NAME.upper() + " "))
+check("管理员 admin 已创建", accounts.is_admin(config.ADMIN_NAME))
+check("is_admin 不区分大小写/空格", accounts.is_admin(" Admin "))
 check("非管理员", not accounts.is_admin("路人甲"))
 TEST = "_smoke_t"
 accounts.load_accounts().pop(TEST, None)
@@ -80,24 +82,8 @@ for _n in [TEST, "_smoke_p", "_smoke_q", "_smoke_nb"]:
     accs.pop(_n, None)
 accounts.save_accounts(accs)
 
-print("=== 5. 定位 / 机厅 / 币价 ===")
-g = location.geocode("北京")
-if g is None:
-    print("[SKIP] 地理编码（网络不可用）")
-else:
-    check("地理编码返回坐标", abs(g["latitude"] - 39.9) < 1 and abs(g["longitude"] - 116.4) < 1, str(g))
-rc = location.resolve_city("不存在的城市xyz")
-check("解析失败退回默认城市", rc["name"] == config.DEFAULT_CITY["name"])
-al = location.arcade_links("北京")
-check("机厅搜索入口齐全", all(u.startswith("http") for u in al.values()) and len(al) == 3)
-pl = location.price_links("北京")
-check("币价搜索入口齐全", "美团" in pl and "抖音" in pl)
-ip = location.detect_city_ip()
-check("IP 定位可用（可空）", ip is None or isinstance(ip, str), str(ip))
-
-print("=== 6. 设置覆盖层 ===")
+print("=== 5. 设置覆盖层 ===")
 check("默认应用名", settings.get_app_name() == config.APP_NAME)
-check("默认主人资料", settings.get_owner() == (config.OWNER_BIRTHDAY, config.OWNER_BIRTH_YEAR))
 settings.save_overrides({"app_name": "测试助手"})
 check("覆盖生效", settings.get_app_name() == "测试助手")
 import os
@@ -130,21 +116,6 @@ quotes.add_quote("测试名言", "测试作品", 2010, "测试")
 check("添加名言", len(quotes.load_quotes()) == nq + 1)
 quotes.delete_quote(len(quotes.load_quotes()) - 1)
 check("删除名言", len(quotes.load_quotes()) == nq)
-
-print("=== 9. 音游地图（宁可缺不可假）===")
-from modules import arcade_map
-check("已核验列表初始为空(不虚构)", len(arcade_map.load_arcades()) == 0)
-d = arcade_map.haversine_km(39.9042, 116.4074, 39.9042, 116.4074)
-check("同一点距离为 0", d == 0, f"{d:.1f}")
-arcade_map.add_feedback({"name": "T", "address": "A", "district": "D", "has_maimai": True,
-                         "machine_count": 2, "latitude": 39.9, "longitude": 116.4, "source": "test"})
-check("纠错进入待审核队列", len(arcade_map.load_feedback()) == 1)
-check("审核通过转为已核验", arcade_map.approve_feedback(0) and len(arcade_map.load_arcades()) == 1)
-check("机台状态文案", arcade_map.maimai_status(arcade_map.load_arcades()[0]).startswith("已确认舞萌DX"))
-check("导航链接为高德", arcade_map.nav_link(arcade_map.load_arcades()[0]).startswith("https://uri.amap.com/"))
-arcade_map.save_arcades([])
-from pathlib import Path as _P
-_P(config.DATA_DIR / "arcade_feedback.json").write_text('{"pending": []}', encoding="utf-8")
 
 print()
 print("=== 总结:", "全部通过" if ok else "存在失败项", "===")

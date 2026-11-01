@@ -4,57 +4,21 @@ config.py —— 全局配置（舞萌助手）
 
 所有可调参数集中在这里。账号数据在 data/accounts.json，
 名言在 data/quotes.json，曲库快照在 data/maimai_songs.json。
-
-想改成自己的版本，优先改本文件顶部的「个人资料」段，
-不需要动业务代码。
 """
 import os
 from pathlib import Path
 
 # ---------- 路径 ----------
 BASE_DIR = Path(__file__).resolve().parent
-# 打包成桌面版时，程序文件只读、用户数据写到可写目录；
-# 开发时默认都放在项目内的 data/。
+# Desktop builds keep read-only program files beside the EXE, while accounts and
+# user data live in a writable per-user directory.
 DATA_DIR = Path(os.environ.get("MPH_DATA_DIR", BASE_DIR / "data"))
 SONGS_CACHE = DATA_DIR / "maimai_songs.json"
 ACCOUNTS_FILE = DATA_DIR / "accounts.json"     # 本地账号库（密码加盐哈希）
 QUOTES_FILE = DATA_DIR / "quotes.json"         # 2000-2017 动漫/Galgame 名言
 SHARE_DIR = DATA_DIR / "share"
 BG_DIR = DATA_DIR / "bg"                       # 程序化生成的主题背景
-MIKU_DIR = DATA_DIR / "miku"                   # 初音插画（原创/自备）
-
-# ---------- 个人资料（改成你自己的） ----------
-# 「私人空间」的入口：注册时使用这个用户名，会触发身份验证。
-OWNER_NAME = "旅人"
-OWNER_BIRTHDAY = (1, 1)          # 月, 日
-OWNER_BIRTH_YEAR = 2000          # 用于算年龄
-
-# 私人空间首页展示的资料。可自由修改，或登录管理员后在面板里改应用名/生日。
-OWNER_SUBJECT = {
-    "name": OWNER_NAME,
-    "birthday": f"{OWNER_BIRTH_YEAR:04d}-{OWNER_BIRTHDAY[0]:02d}-{OWNER_BIRTHDAY[1]:02d}",
-    "city": "北京市",
-    "level": "高手",
-    "level_tag": "高水平玩家",
-    "likes": ["初音未来（Hatsune Miku）", "VOCALOID / 术力口",
-              "《世界计划 缤纷舞台》", "舞萌 DX"],
-    "welcome": "欢迎回来。今天也把手感养好，把喜欢的歌唱完。",
-}
-PRIVATE_TITLE = f"为{OWNER_NAME}准备的今日节奏计划"
-
-# 专属登录限流：连续失败 N 次后锁定 cooldown 秒
-VIP_MAX_FAILS = 5
-VIP_LOCK_SECONDS = 60
-
-# ---------- 天气：默认城市（可改） ----------
-CITY = {
-    "name": "北京市",
-    "latitude": 39.9042,
-    "longitude": 116.4074,
-    "timezone": "Asia/Shanghai",
-}
-WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
-WEATHER_TIMEOUT = 8
+MIKU_DIR = DATA_DIR / "miku"                   # 真实初音立绘（用户导入/AI生成）
 
 # ---------- 曲库来源（国服口径） ----------
 SONGS_API = "https://www.diving-fish.com/api/maimaidxprober/music_data"
@@ -124,11 +88,8 @@ GENRE_PRIORITY = [
 VOCALOID_GENRE = "niconico & VOCALOID"
 MIKU_KEYWORDS = ["初音ミク", "初音未来", "Hatsune Miku", "プロジェクトセカイ", "世界计划"]
 
-# ---------- 生日彩蛋 ----------
-BIRTHDAY_WISH_TITLE = "生日快乐"
-
 # ---------- 名言（每次刷新一句，2000-2017 动漫/Galgame） ----------
-QUOTES_YEAR_MIN, QUOTES_YEAR_MAX = 2000, 2017
+QUOTES_YEAR_MIN, QUOTES_YEAR_MAX = 2000, 2026
 
 # ---------- 视频链接（读谱用） ----------
 # 不伪造具体视频地址，而是生成 B 站搜索链接（真实可用，直达该曲谱面确认视频搜索结果）。
@@ -159,12 +120,11 @@ FONT_BOLD_CANDIDATES = [r"C:\Windows\Fonts\msyhbd.ttc", r"C:\Windows\Fonts\msyh.
 
 # ---------- 界面文案 ----------
 APP_NAME = "舞萌助手"
-APP_SUBTITLE = "Hatsune Miku × maimai DX · 本地个人版"
+APP_SUBTITLE = "Hatsune Miku × maimai DX · 本地版"
 DEFAULT_WELCOME = "今天是属于你的选曲日。手别凉着，先把手感找回来。"
-
 # ---------- 管理员 ----------
 ADMIN_NAME = "admin"          # 管理员账号名（登录后可进管理员面板改配置/名言/攻略）
-ADMIN_PASSWORD_ENV = "MPH_ADMIN_PASSWORD"   # 首次运行时从这里读管理员密码
+ADMIN_PASSWORD_ENV = "MPH_ADMIN_PASSWORD"   # 首次运行从这里读管理员密码
 
 # ---------- 设置覆盖层（管理员面板可改，存 data/settings.json） ----------
 SETTINGS_FILE = DATA_DIR / "settings.json"
@@ -175,18 +135,8 @@ PW_MIN_LEN = 8               # 至少 8 位（不是"正好8位"）
 # 生日可选范围
 BIRTH_MIN_YEAR, BIRTH_MAX_YEAR = 1900, 2035
 
-# ---------- 定位 / 机厅 / 币价 ----------
+# ---------- 默认城市（兜底） ----------
 DEFAULT_CITY = {"name": "北京市", "latitude": 39.9042, "longitude": 116.4074}
-GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
-IP_GEO_URLS = ["https://ipwho.is/", "https://ipinfo.io/json"]
-GEO_TIMEOUT = 8
-# 机厅 / 币价 搜索入口（真实可用，不伪造具体数据）
-AMAP_SEARCH = "https://www.amap.com/search?query={kw}"
-BAIDU_MAP_SEARCH = "https://map.baidu.com/search/{kw}"
-MEITUAN_SEARCH = "https://apimall.meituan.com/#/search?keyword={kw}"
-DOUYIN_SEARCH = "https://www.douyin.com/search/{kw}"
-ARCADE_KEYWORD_TPL = "舞萌DX 机厅 {city}"
-PRICE_KEYWORD_TPL = "舞萌DX 游戏币 价格 {city}"
 
 # ---------- 攻略专区 ----------
 GUIDES_FILE = DATA_DIR / "guides.json"

@@ -11,6 +11,8 @@ dist/
 data/accounts.json
 data/userdata.json
 data/settings.json
+data/playlog.json
+data/dan.json
 data/galgame_saves.json
 data/share/
 data/INITIAL_ADMIN_PASSWORD.txt

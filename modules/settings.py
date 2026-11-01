@@ -17,8 +17,6 @@ import config
 def _defaults() -> dict:
     return {
         "app_name": config.APP_NAME,
-        "owner_birthday": list(config.OWNER_BIRTHDAY),
-        "owner_birth_year": config.OWNER_BIRTH_YEAR,
         "levels": config.LEVELS,
         "default_welcome": config.DEFAULT_WELCOME,
     }
@@ -59,11 +57,6 @@ def save_overrides(overrides: dict) -> None:
 def get_app_name() -> str:
     return load_settings().get("app_name") or config.APP_NAME
 
-
-def get_owner() -> tuple:
-    s = load_settings()
-    b = s.get("owner_birthday") or list(config.OWNER_BIRTHDAY)
-    return tuple(b), s.get("owner_birth_year", config.OWNER_BIRTH_YEAR)
 
 
 def get_levels() -> dict:

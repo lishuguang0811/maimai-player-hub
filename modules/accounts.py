@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-accounts.py —— 账号系统（3.0：注册校验 + scrypt 哈希 + role/vip_status 权限）
+accounts.py —— 账号系统（注册校验 + scrypt 哈希 + role 权限）
 
-权限模型（文档 2.4）：
+权限模型：
 - role: "user" / "admin"
-- vip_status: None(普通) / "pending"(注册了主人用户名但未验证) / "verified"(已验证)
-- vip_verified_at: 验证通过时间
-区分四类：普通用户 / 已注册未验证 / 已验证 VIP / 管理员。
-"用户名是主人" != "已有权限"——必须通过身份验证才授予访问权。
+- 密码只存加盐哈希，不存明文，不联网。
 
 密码：新注册用 hashlib.scrypt（文档要求的专用 KDF）；旧的 sha256 账号登录时
 自动迁移为 scrypt。盐随机，不存明文，不联网。
@@ -123,16 +120,12 @@ def save_accounts(accounts: dict) -> None:
 
 
 def migrate_accounts() -> None:
-    """给旧账号补 role/vip_status/vip_verified_at/kdf 字段（不破坏已有数据）。"""
+    """给旧账号补 role/kdf/phone/coin_note 字段（不破坏已有数据）。"""
     accounts = load_accounts()
     changed = False
     for key, acc in accounts.items():
         if "role" not in acc:
             acc["role"] = "admin" if key == _norm(config.ADMIN_NAME) else "user"; changed = True
-        if "vip_status" not in acc:
-            acc["vip_status"] = None; changed = True
-        if "vip_verified_at" not in acc:
-            acc["vip_verified_at"] = None; changed = True
         if "kdf" not in acc:
             acc["kdf"] = "sha256"; changed = True
         acc.setdefault("phone", acc.get("phone", ""))
@@ -152,10 +145,6 @@ def find_account(name_or_phone: str) -> tuple[str | None, dict | None]:
             if _norm_phone(acc.get("phone", "")) == phone:
                 return k, acc
     return None, None
-
-
-def is_owner_name(name: str) -> bool:
-    return _norm(name) == _norm(config.OWNER_NAME)
 
 
 def register(name, password, birthday, city, level, hobbies,
@@ -188,8 +177,6 @@ def register(name, password, birthday, city, level, hobbies,
                 return False, "这个手机号已被其它账号绑定。"
 
     salt = secrets.token_hex(16)
-    # 注册主人用户名 -> 创建为待验证状态（不自动授权，需后续身份验证）
-    vip_status = "pending" if is_owner_name(name) else None
     accounts[key] = {
         "name": name, "salt": salt, "kdf": "scrypt",
         "password_hash": _hash(password, salt, "scrypt"),
@@ -197,12 +184,10 @@ def register(name, password, birthday, city, level, hobbies,
         "city": city or config.DEFAULT_CITY["name"],
         "level": level, "hobbies": hobbies or [],
         "coin_note": coin_note or "", "phone": phone_n,
-        "role": "user", "vip_status": vip_status, "vip_verified_at": None,
+        "role": "user",
         "created": datetime.now().isoformat(timespec="seconds"),
     }
     save_accounts(accounts)
-    if vip_status == "pending":
-        return True, f"已创建「{name}」，请完成专属身份验证以开通 VIP。"
     return True, f"注册成功，欢迎 {name}！"
 
 
@@ -266,21 +251,6 @@ def reset_password(name_or_phone, birthday, new_pw) -> tuple[bool, str]:
     return True, "找回成功，密码已重置，请用新密码登录。"
 
 
-def grant_vip(name: str) -> bool:
-    """身份验证通过后，由后端授予 VIP（不能由前端决定）。"""
-    key, acc = find_account(name)
-    if acc is None:
-        return False
-    acc["vip_status"] = "verified"
-    acc["vip_verified_at"] = datetime.now().isoformat(timespec="seconds")
-    allacc = load_accounts(); allacc[key] = acc; save_accounts(allacc)
-    return True
-
-
-def is_vip(acc: dict | None) -> bool:
-    return bool(acc) and acc.get("vip_status") == "verified"
-
-
 def is_admin(name: str) -> bool:
     _, acc = find_account(name)
     return bool(acc) and acc.get("role") == "admin"
@@ -296,7 +266,6 @@ def update_field(name, **fields) -> bool:
 
 
 def _random_admin_password() -> str:
-    """生成一个满足密码规则（8 位以上，含数字/大写/小写）的随机密码。"""
     alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
     while True:
         pwd = "".join(secrets.choice(alphabet) for _ in range(16))
@@ -305,11 +274,6 @@ def _random_admin_password() -> str:
 
 
 def ensure_admin(default_password: str | None = None) -> None:
-    """首次运行时创建管理员账号。
-
-    密码来源优先级：显式参数 > 环境变量 MPH_ADMIN_PASSWORD > 随机生成。
-    随机生成时会写入 data/INITIAL_ADMIN_PASSWORD.txt，登录后请立即修改。
-    """
     migrate_accounts()
     accounts = load_accounts()
     if _norm(config.ADMIN_NAME) in accounts:
@@ -326,7 +290,7 @@ def ensure_admin(default_password: str | None = None) -> None:
         "birthday": None, "city": config.DEFAULT_CITY["name"],
         "level": config.DEFAULT_LEVEL, "hobbies": [],
         "coin_note": "", "phone": "",
-        "role": "admin", "vip_status": None, "vip_verified_at": None,
+        "role": "admin",
         "created": datetime.now().isoformat(timespec="seconds"),
     }
     save_accounts(accounts)

@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-birthday_test.py —— 生日范围 1900-01-01 ~ 2035-12-31 边界测试
+birthday_test.py —— 生日范围 1900-01-01 ~ 2035-12-31 边界测试（文档第二节硬性要求）
 
 覆盖：合法边界、闰年、非法日期、越界、空值(可选)、register/reset 集成、
 以及注册页日期选择器的实际允许范围。
 """
-from _env import ROOT  # noqa: F401  必须在 config 之前导入
-
 import sys
 from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from _env import ROOT  # noqa: F401  必须在 config 之前导入
 
 import config
 from modules import accounts
@@ -76,6 +80,7 @@ a = accounts.load_accounts(); a.pop("_bd_r", None); accounts.save_accounts(a)
 print("=== 5. 注册页日期选择器实际范围 ===")
 from streamlit.testing.v1 import AppTest
 at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=120).run()
+# 注册表单的生日 date_input：找带 min/max 的那个
 di = at.date_input
 got_min = got_max = None
 for el in di:
@@ -86,6 +91,7 @@ if got_min is not None:
     check("选择器下限=1900-01-01", got_min == date(1900, 1, 1), str(got_min))
     check("选择器上限=2035-12-31", got_max == date(2035, 12, 31), str(got_max))
 else:
+    # AppTest 未暴露 min/max 时，退而校验源码确实把 config 范围传给了 date_input
     src = (ROOT / "app.py").read_text(encoding="utf-8")
     check("源码 date_input 用 config 1900 下限",
           "min_value=date(config.BIRTH_MIN_YEAR, 1, 1)" in src)

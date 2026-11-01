@@ -160,38 +160,14 @@ class LibraryAdapter:
         return chunk, start + page_size < len(hits)
 
 
-class SoundCloudAdapter:
-    """
-    SoundCloud 官方 API/嵌入适配器（骨架）。
-    未配置 SOUNDCLOUD_CLIENT_ID 时 configured()=False、search() 返回空，
-    由界面明确提示"未配置"，绝不伪装在线搜索可用。
-    配置后才会真正请求官方 API（需自行确认开发者条款/配额/播放授权）。
-    """
-    name = "SoundCloud"
-
-    def configured(self):
-        return bool(os.environ.get("SOUNDCLOUD_CLIENT_ID"))
-
-    def search(self, query="", page=1, page_size=20):
-        if not self.configured():
-            return [], False
-        # 真实接入需调用官方 API 并校验每首的播放/嵌入授权；此处不伪造结果。
-        return [], False
-
-    def get_embed_info(self, track_id):
-        if not self.configured():
-            return None
-        return None
-
-
-ADAPTERS = [LocalBgmAdapter, LibraryAdapter, SoundCloudAdapter]
+ADAPTERS = [LocalBgmAdapter, LibraryAdapter]
 
 
 class MusicSource:
     """统一搜索入口：合并各适配器、去重、不伪造。"""
 
     def __init__(self, records=None):
-        self.adapters = [LocalBgmAdapter(), LibraryAdapter(records), SoundCloudAdapter()]
+        self.adapters = [LocalBgmAdapter(), LibraryAdapter(records)]
 
     def configured_note(self):
         notes = []
@@ -267,6 +243,33 @@ def youtube_watch_url(vid):
 def youtube_search_url(query):
     from urllib.parse import quote as _q
     return "https://www.youtube.com/results?search_query=" + _q(query or "")
+
+
+# ---------------- 外部收听入口（跳转官方平台，不在本程序内播放） ----------------
+# 舞萌曲库的曲目没有可用于本程序的音频授权，所以统一做成"跳转网易云搜索"：
+# 用户点一下就在新标签页打开网易云的搜索结果，听歌在正版平台完成。
+NETEASE_SEARCH = "https://music.163.com/#/search/m/?s={q}"
+QQ_MUSIC_SEARCH = "https://y.qq.com/n/ryqq/search?w={q}"
+
+
+def _q(s: str) -> str:
+    from urllib.parse import quote
+    return quote((s or "").strip())
+
+
+def netease_search_url(query: str, artist: str = "") -> str:
+    """网易云音乐搜索链接。带艺人能显著提高搜到正确版本的概率。"""
+    kw = query or ""
+    if artist and artist not in ("未知", ""):
+        kw = f"{query} {artist}"
+    return NETEASE_SEARCH.format(q=_q(kw))
+
+
+def qqmusic_search_url(query: str, artist: str = "") -> str:
+    kw = query or ""
+    if artist and artist not in ("未知", ""):
+        kw = f"{query} {artist}"
+    return QQ_MUSIC_SEARCH.format(q=_q(kw))
 
 
 def track_from_youtube(s, title=""):

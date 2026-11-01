@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """phase3_test.py —— 练习清单 / 手动成绩 / 每用户隔离 / 收藏加权推荐。"""
-from _env import ROOT  # noqa: F401  必须在 config 之前导入
-
 import sys
 from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from _env import ROOT  # noqa: F401  必须在 config 之前导入
 
 import config
 from modules import recommend, songs, userdata

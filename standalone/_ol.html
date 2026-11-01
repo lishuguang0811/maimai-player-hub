@@ -1,0 +1,93 @@
+<html><head><meta charset="utf-8">
+<title>DONE</title></head><body style="margin:0;font:12px monospace;background:#111;color:#ddd">
+<iframe id="f" src="maimai-web/index.html" style="width:412px;height:900px;border:0;opacity:0;position:absolute;left:-9999px"></iframe>
+<pre id="log">找不到注册表单；view 文本: 👋 第一次来？① 曲库：搜索曲目、看难度定数、收藏② 机台：选歌直接开打，自动记成绩③ 成绩 / 练习：成绩码导入、练习清单、手动登记④ 我的：换主题、改密码、导出数据备份⑤ AstroDX 一体机：一键安装并启动原版 AstroDX我知道了欢迎来到 舞萌助手纯前端版 · 数据全部存在本机，不上传任何服务器登录 / 注册查曲库进机台看剧情🕹️AstroDX 一体机仅在安装版 App 中可用未接入你现在是用浏览器打开的网页版，没有原生通道。装上「舞萌DX合一版」APK 后，这里会变成「一键安装 / 一键启动」，不用再另外去找 AstroDX 安装包。曲库 1281 首你的成绩 0 局练习中 0收藏 0连续打卡 0 天恋爱这种事，往往攻其不备。</pre>
+<script>
+var out = [], done = false;
+function say(s) { out.push(s); document.getElementById('log').textContent = out.join('\n'); }
+function fin() { if (done) return; done = true; document.title = 'DONE'; }
+var errs = [];
+window.onerror = function (m, u, l) { errs.push(m + '@' + l); };
+
+var f = document.getElementById('f');
+f.onload = function () {
+  var d = f.contentDocument, w = f.contentWindow;
+  try {
+    localStorage.clear();
+    var acc = d.querySelector('#lg-name') || d.querySelector('input[placeholder*="昵称"]') || d.querySelector('input');
+    // 直接走注册：找“我的”页
+    var navs = d.querySelectorAll('footer [data-go], footer button, nav [data-go]');
+    var meBtn = null;
+    for (var i = 0; i < navs.length; i++) {
+      if ((navs[i].textContent || '').indexOf('我的') >= 0) meBtn = navs[i];
+    }
+    if (meBtn) meBtn.click();
+    setTimeout(step1, 150);
+  } catch (e) { say('ERR0 ' + e.message); fin(); }
+};
+
+function step1() {
+  var d = f.contentDocument;
+  try {
+    var name = d.querySelector('#rg-name'), pw = d.querySelector('#rg-pw'), btn = d.querySelector('#rg-do');
+    if (!name) { say('找不到注册表单；view 文本: ' + (d.querySelector('#view') || {}).textContent); fin(); return; }
+    name.value = '孤云'; pw.value = 'abc12345';
+    var bd = d.querySelector('#rg-bd'); if (bd) bd.value = '2007-11-08';
+    name.dispatchEvent(new Event('input')); pw.dispatchEvent(new Event('input'));
+    btn.click();
+    setTimeout(step2, 300);
+  } catch (e) { say('ERR1 ' + e.message); fin(); }
+}
+
+function step2() {
+  var d = f.contentDocument;
+  try {
+    // 进 VIP → 答“孤云”
+    var navs = d.querySelectorAll('[data-go]');
+    for (var i = 0; i < navs.length; i++) if ((navs[i].textContent || '').indexOf('VIP') >= 0) { navs[i].click(); break; }
+    setTimeout(function () {
+      var inp = d.querySelector('#vip-a0'), b = d.querySelector('#vip-do');
+      if (!inp) { say('VIP 表单缺失: ' + (d.querySelector('#view') || {}).textContent.slice(0, 120)); fin(); return; }
+      inp.value = '孤云'; b.click();
+      setTimeout(step3, 300);
+    }, 250);
+  } catch (e) { say('ERR2 ' + e.message); fin(); }
+}
+
+var steps = 0;
+function step3() {
+  var d = f.contentDocument;
+  try {
+    if (steps === 0) say('VIP 状态: ' + ((d.querySelector('#view') || {}).textContent || '').slice(0, 40).replace(/\s+/g, ' '));
+    if (steps > 200) { say('步数超限'); fin(); return; }
+    var v = d.querySelector('#view');
+    var letter = d.querySelector('.vnletter');
+    if (letter) {
+      var title = (d.querySelector('.vnltitle') || {}).textContent || '';
+      var body = letter.textContent || '';
+      if (title) body = body.slice(title.length);
+      say('TITLE=' + title);
+      say('BODYLEN=' + body.length);
+      say('BODY_START=' + body.slice(0, 12).replace(/\n/g, '\\n'));
+      say('BODY_END=' + body.slice(-8).replace(/\n/g, '\\n'));
+      say('HAS_SIGN=' + body.indexOf('——你的朋友') >= 0);
+      say('HAS_FAKE=' + (body.indexOf('给十九岁的你') >= 0 || body.indexOf('机台边的灯') >= 0));
+      say('errors=' + (errs.length ? errs.join('|') : 'none'));
+      fin(); return;
+    }
+    // 生日节点
+    var bd = d.querySelector('#bd-in');
+    if (bd) { bd.value = '2007-11-08'; d.querySelector('#bd-do').click(); steps++; setTimeout(step3, 70); return; }
+    // 选项
+    var opts = d.querySelectorAll('[data-opt]');
+    if (opts.length) { opts[0].click(); steps++; setTimeout(step3, 70); return; }
+    // 下一句
+    var nx = d.querySelector('#st-next');
+    if (nx) { nx.click(); steps++; setTimeout(step3, 40); return; }
+    say('卡住，v=' + (v ? v.textContent.slice(0, 100) : 'null'));
+    fin();
+  } catch (e) { say('ERR3 ' + e.message); fin(); }
+}
+setTimeout(fin, 20000);
+</script>
+</body></html>

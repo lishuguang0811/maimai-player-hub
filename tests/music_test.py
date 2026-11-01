@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """music_test.py —— 播放状态机 + 音源适配器(诚实区分可播放/仅展示) + 统一搜索。"""
-from _env import ROOT  # noqa: F401  必须在 config 之前导入
-
 import random
 import sys
+from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from _env import ROOT  # noqa: F401
 from modules import music, songs
 
 ok = True
@@ -74,15 +77,13 @@ check("曲库结果带B站来源链接", all(t["url"].startswith("https://search
 empty, _ = lib.search("zzz不存在的曲目xyz")
 check("曲库无结果返回空", len(empty) == 0)
 
-sc = music.SoundCloudAdapter()
-check("SoundCloud 未配置(无密钥)", not sc.configured())
-scr, _ = sc.search("miku")
-check("未配置时搜索返回空(不伪装)", scr == [])
+# SoundCloud 适配器已经整个拿掉了（没有授权就不提供入口），这里确认它确实不在了
+check("不再有 SoundCloud 适配器", not hasattr(music, "SoundCloudAdapter"))
 
 print("=== 4. 统一搜索 ===")
 ms = music.MusicSource(recs)
 notes = ms.configured_note()
-check("配置提示含 SoundCloud 未配置", any("SoundCloud" in n for n in notes), str(notes))
+check("配置提示存在且不提 SoundCloud", isinstance(notes, list) and all("SoundCloud" not in n for n in notes), str(notes))
 merged, _ = ms.search("初音")
 check("合并结果非空", len(merged) > 0)
 check("可播放排前面", merged[0]["playable"] if any(t["playable"] for t in merged) else True)

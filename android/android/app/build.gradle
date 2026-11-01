@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.maimai.hub'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.maimai.hub'
+        minSdk 23
+        targetSdk 35
+        versionCode 4
+        versionName '3.1.0'
+    }
+
+    // 打出来的 APK 叫这个名，好找
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "舞萌DX大厅-${variant.versionName}.apk"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // assets/www/index.html 就是整个机台，不需要任何额外资源
+    aaptOptions {
+        noCompress 'html'
+    }
+}
